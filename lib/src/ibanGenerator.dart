@@ -1,115 +1,85 @@
-
 import "dart:math";
 
-var unitCodes = [
-    "10100000", "10100039", "10100055", "10100068", "10101010", "10101023", "10101049", "10101078", "10101140", "10101212", "10101238", "10101270", "10101339", "10101371", "10101397", "10101401", "10101469", "10101528", "10101599", "10101674", "10101704", "10200003", "10200016",
-];
-
 void main(){
-  GenerateIbanNumber().printik();
-  
+  var newIbanNumber = new GenerateIbanNumber(16, '252100');
+  newIbanNumber.generateIbanNumber();
+  try {
+      print(newIbanNumber.ibanNumber);
+    } catch(exception, stackTrace) {
+      print(exception);
+      print(stackTrace);
+    }
+
 }
 
 class GenerateIbanNumber{
- /* var ibanNumber = createIbanNumber();
-  returnIbanNumber(){
-    print(ibanNumber);
-  }*/
+  
+  int lengthOfAccNum;
+  String controlNum, accNum, bankUnicodeNum, ibanNumber, plCodeNumber, baseForControlNumber;
+  
+  // call class in clas and add .initilize automaticly give value whe in create a instance of new class
+  GenerateIbanNumber(this.lengthOfAccNum, this.plCodeNumber);
+ 
+  var unitCodes = [
+    "10100000", "10100039", "10100055", "10100068", "10101010", "10101023", "10101049", "10101078", "10101140", "10101212", "10101238", "10101270", "10101339", "10101371", "10101397", "10101401", "10101469", "10101528", "10101599", "10101674", "10101704", "10200003", "10200016",
+];
   
   printik(){
-    print(accountNumber(16));
-    var bankCode = unitCodes[new Random().nextInt(unitCodes.length - 1)];
-    print(bankCode.runtimeType);
-    print((''+accountNumber(16) + bankCode).runtimeType);
-    print(createIbanNumber());
+		//String base = createBaseForControlNum();
+    baseForControlNumber = bankUnicodeNum + accNum + plCodeNumber;
+    //controlNum = ibanControlNumber(baseForControlNumber);
+    //this.ibanNumber = controlNum + base;
+    
+    
+    print(baseForControlNumber);
   }
-}
-
-
-// how to convert from string to INT. My idea is that i will create part of hall iban number like a strin an next parse to INT and divide by 97
-// this is how parse init form string
-String accountNumber(numLength){
+  
+  void generateIbanNumber(){
+    createBaseForControlNum();
+    ibanControlNumber(baseForControlNumber);
+    var testIbanLength = controlNum + bankUnicodeNum + accNum;
+    if (testIbanLength.length != 26) {
+      generateIbanNumber();
+    }else {
+      ibanNumber = testIbanLength;
+    }
+  }
+  
+  String accountNumber(numLength){
+    String accNum;
+    List controlNumber = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2];
     List listOfNumbers = [];
-      for(var i=0; i < numLength; i++){
-        listOfNumbers.add(new Random().nextInt(9));
-      }
-    var accNum = listOfNumbers.join("");
+    int sumControlAcc = 0;
+    
+    for(var i=0; i < numLength; i++){
+      listOfNumbers.add(new Random().nextInt(9));
+    }
+    
+    for (var i = 0; i< numLength; i++){
+      sumControlAcc = sumControlAcc + (controlNumber[i]*listOfNumbers[i]);
+    }
+    
+    if (sumControlAcc % 10 != 0){
+      accountNumber(numLength);
+    } 
+    accNum = listOfNumbers.join("");
     return accNum;
     }
   
-  ibanControlNumber(base){
-    String plNumber = '252100';
-    var numToConvert = base + plNumber;
+  ibanControlNumber(String base){
+    var numToConvert = base + plCodeNumber;
     var baseNum = int.parse(numToConvert);
     var newBase = baseNum % 97;
     var controlNumber = 98 - newBase;
-    controlNumber.toString();
-    return controlNumber;
+  	controlNum = controlNumber.toString();
+    
   }
   
-  String createIbanNumber(){
-    var accNumber = accountNumber(16);
-    var bankCode = unitCodes[new Random().nextInt(unitCodes.length - 1)];
-		var base = '' + accNumber + bankCode;
-    var controlNumber = ibanControlNumber(base);
-    var ibanNumber = controlNumber + bankCode + accNumber;
-    return ibanNumber;
+  createBaseForControlNum(){
+    accNum = accountNumber(lengthOfAccNum);
+    bankUnicodeNum = '10100039'/*unitCodes[new Random().nextInt(unitCodes.length - 1)]*/;
+		baseForControlNumber = ''  + bankUnicodeNum + accNum;
   }
-
-/*
-Code which i found in net. I try and this code create proper IBAN code
-
-This code I was found in webpage: http://generatory.it/
-*/
-
-
-
-
-/*
-function generateIban(prefix, spaces) {
-    var unitCode = getRandomUnitCode();
-    var randomPart = getIbanRandomPart();
-    var base = "" + unitCode + randomPart;
-    var controlSum = getIbanControlSumField(base);
-    var iban = controlSum + base;
-    if (spaces) {
-        iban = prettyFormated(iban);
-    }
-    if (prefix) {
-        if (spaces) {
-            iban = 'PL ' + iban;
-        }
-        else {
-            iban = 'PL' + iban;
-        }
-    }
-    return iban;
 }
 
 
-function getRandomUnitCode() {
-    var index = getRandomInt(0, unitCodes.length-1);
-    return unitCodes[index];
-}
-
-function getIbanRandomPart() {
-    var randomInt = getRandomInt(0, 9999999999999999);
-    return addLeadingZeros(randomInt, 16);
-}
-
-function getIbanControlSumField(base) {
-    var baseNumber = bigInt(base + "252100");
-    var rest = baseNumber.divmod(97);
-    var controlNumber = 98 - rest.remainder.value;
-    return addLeadingZeros(controlNumber, 2);
-}
-
-function prettyFormated(iban) {
-    var formated = iban.substring(0, 2);
-    for (i = 2; i < 26; i+=4) {
-        formated = formated + ' ' + iban.substring(i, i+4);
-    }
-    return formated;
-}
-
-*/

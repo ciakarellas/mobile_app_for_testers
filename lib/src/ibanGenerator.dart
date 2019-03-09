@@ -1,6 +1,6 @@
 import "dart:math";
 
-void main(){
+/*void main(){
   var newIbanNumber = new GenerateIbanNumber(16, '252100');
   newIbanNumber.generateIbanNumber();
   try {
@@ -10,38 +10,28 @@ void main(){
       print(stackTrace);
     }
 
-}
+}*/
 
 class GenerateIbanNumber{
   
   int lengthOfAccNum;
-  String controlNum, accNum, bankUnicodeNum, ibanNumber, plCodeNumber, baseForControlNumber;
+  String controlNum, accNum, bankUnicodeNum, /*ibanNumber,*/ plCodeNumber, baseForControlNumber;
   
   // call class in clas and add .initilize automaticly give value whe in create a instance of new class
   GenerateIbanNumber(this.lengthOfAccNum, this.plCodeNumber);
  
   var unitCodes = [
-    "10100000", "10100039", "10100055", "10100068", "10101010", "10101023", "10101049", "10101078", "10101140", "10101212", "10101238", "10101270", "10101339", "10101371", "10101397", "10101401", "10101469", "10101528", "10101599", "10101674", "10101704", "10200003", "10200016",
-];
+    "24900005", "10100039", "16000003", "10600005", "11300007", "10300006", "11600006", "15400004", "13200006", "24000015", "10900004", "35000020", "19400008", "88000093", "14700002", "14600009", "19500001", "11400000", "13000000", "25600007", "10200003", "17500009",];
   
-  printik(){
-		//String base = createBaseForControlNum();
-    baseForControlNumber = bankUnicodeNum + accNum + plCodeNumber;
-    //controlNum = ibanControlNumber(baseForControlNumber);
-    //this.ibanNumber = controlNum + base;
-    
-    
-    print(baseForControlNumber);
-  }
-  
-  void generateIbanNumber(){
+  generateIbanNumber(){
     createBaseForControlNum();
     ibanControlNumber(baseForControlNumber);
     var testIbanLength = controlNum + bankUnicodeNum + accNum;
     if (testIbanLength.length != 26) {
       generateIbanNumber();
     }else {
-      ibanNumber = testIbanLength;
+      //ibanNumber = testIbanLength;
+      return testIbanLength;
     }
   }
   
@@ -67,19 +57,25 @@ class GenerateIbanNumber{
     }
   
   ibanControlNumber(String base){
+    
+    //this is way to modulo big number. Split the string. This below is code for that
     var numToConvert = base + plCodeNumber;
-    var baseNum = int.parse(numToConvert);
-    var newBase = baseNum % 97;
-    var controlNumber = 98 - newBase;
+    var firstPart = numToConvert.substring(0,10);
+    var firstPartModulo = int.parse(firstPart) % 97;
+    var secondPart = firstPartModulo.toString() + numToConvert.substring(10,20);
+    var secondPartModulo = int.parse(secondPart) % 97;
+    var thirdPart = secondPartModulo.toString() + numToConvert.substring(20,30);
+    var thirdPartModulo = int.parse(thirdPart) % 97;
+    var controlNumber = 98 - thirdPartModulo;
+    
   	controlNum = controlNumber.toString();
     
   }
   
   createBaseForControlNum(){
     accNum = accountNumber(lengthOfAccNum);
-    bankUnicodeNum = '10100039'/*unitCodes[new Random().nextInt(unitCodes.length - 1)]*/;
+    bankUnicodeNum = unitCodes[new Random().nextInt(unitCodes.length - 1)];
 		baseForControlNumber = ''  + bankUnicodeNum + accNum;
   }
 }
-
 

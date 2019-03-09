@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import './ibanGeneratorWidget.dart';
 
 class MyApp extends StatelessWidget {
+  
+
   Widget build(context){
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Text(
-          'data',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold)
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Tester app'),
+          backgroundColor: Colors.indigo[800],
+        ),
+        body: ListView(
+          children: <Widget>[
+            IbanWidget(),
+          ],
           ),
-        )
-      )
-    );
+        ),
+      );
   }
 }
